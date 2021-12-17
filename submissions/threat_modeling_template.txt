@@ -50,6 +50,7 @@ Five potential Kubernetes threats:
   should not be allowed.
 
 
+
 Docker-bench Run Results and Analysis
 From the failed findings, select and document 3 findings from the Docker-bench results that you want to harden based on
 the 5 attack surface areas you identified in Step 1. At least 1 of the 3 hardened findings should be different from the
@@ -62,28 +63,20 @@ I have chosen three findings to evaluate and remediate. Let's take a closer look
   the ability to use digital signatures for data sent to and received from remote Docker registries. These signatures
   allow client-side verification of the identity and the publisher of specific image tags and ensures the provenance of
   container images."
+- Fix: to fix this we need to add 'export DOCKER_CONTENT_TRUST=1'
 
-  Fix: to fix this we need to add 'export DOCKER_CONTENT_TRUST=1'
+2. [FAIL] 5.12 Ensure that the container's root filesystem is mounted as read only (Scored)
+- According to the CIS Docker Benchmark (provided courtesy of the Center for Internet Security): "The container's root
+  filesystem should be treated as a 'golden image' by using Docker run's --read-only option. This prevents any writes to
+  the container's root filesystem at container runtime and enforces the principle of immutable infrastructure."
+- Fix: to fix we should add a --read-only flag at a container's runtime to enforce the container's root filesystem
+  being mounted as read only;
+  docker run <Run arguments> --read-only <Container Image Name or ID> <Command>
 
-
-2. [FAIL] 5.15 Ensure that the host's process namespace is not shared (Scored)
-- According to the CIS Docker Benchmark (provided courtesy of the Center for Internet Security): "PID namespace provides
-  separation between processes. It prevents system processes from being visible, and allows process ids to be reused
-  including PID 1. If the host's PID namespace is shared with containers, it would basically allow these to see all of
-  the processes on the host system. This reduces the benefit of process level isolation between the host and the
-  containers. Under these circumstances a malicious user who has access to a container could get access to processes on
-  the host itself, manipulate them, and even be able to kill them. This could allow for the host itself being shut down,
-  which could be extremely serious, particularly in a multi-tenanted environment. You should not share the host's
-  process namespace with the containers running on it."
-
-  Fix: to fix this we need to add --pid flag to run docker like
-  'docker run --interactive --tty --pid=host emekamomodu/microservices-security-cnand:hardened-v1.0 /bin/bash'
-
-3. [FAIL] 5.4 Ensure that privileged containers are not used (Scored)
-- According to the CIS Docker Benchmark (provided courtesy of the Center for Internet Security): "The --privileged flag
-  provides all capabilities to the container to which it is applied, and also lifts all the limitations enforced by the
-  device cgroup controller. As a consequence this the container has most of the rights of the underlying host. This flag
-  only exists to allow for specific use cases (for example running Docker within Docker) and should not generally be
-  used."
-
-  Fix: to fix this we should not use ----privileged to run docker
+3. [FAIL] 5.25 Ensure that the container is restricted from acquiring additional privileges (Scored)
+- According to the CIS Docker Benchmark (provided courtesy of the Center for Internet Security): "A process can set the
+  no_new_priv bit in the kernel and this persists across forks, clones and execve. The no_new_priv bit ensures that the
+  process and its child processes do not gain any additional privileges via suid or sgid bits. This reduces the danger
+  associated with many operations because the possibility of subverting privileged binaries is lessened."
+- Fix: to fix we should start the container with the options;
+  docker run --rm -it --security-opt=no-new-privileges <Container Image Name or ID> <Command>
