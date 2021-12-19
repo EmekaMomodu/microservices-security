@@ -1,0 +1,23 @@
+How will you test the changes?
+A sandbox environment will be used to test changes to the cluster. This will protect production systems from being
+interrupted or corrupted. This is good practice that we can implement as part of our deployment strategy and Software
+Development Lifecycle.
+We would use different environments to develop our application such as development (sandbox), staging and production
+environment. So We know first we need to apply changes in development environment and test that the functionality is
+working perfectly. Then we need to deploy to staging environment and simulate the actual user behaviour and traffic. If
+this stage is also passed, then we will deploy this to the production environment. If our monitoring system shows any
+unusual activity then we will rollback to our previous version.
+
+How will you ensure the changes don't negatively affect your cluster?
+Using our sandbox environment we will tests changes so we can monitor and observe the impact of those changes. Once
+changes are deployed to the sandbox environment, we can monitor metrics using Prometheus and Grafana. Also, we can
+collect logs and traces to determine the root cause of problems and troubleshoot more efficiently. Historical
+observability in the form of a changelog will be used to construct a continuous changelog that allows us not only to
+understand historical events, but also to trace how historical changes impact the current state of our cluster. Our
+overall focus will be on the state of our cluster as a whole, and not in individual components in isolation to gain a
+full overview of our cluster.
+Before we deploy our application we need to monitor our staging environment through Prometheus and Grafana. If
+everything works fine, we will apply a deployment strategy like blue-green and transfer some traffic to our new
+production environment and always monitor our application. If the monitoring system shows any unusual activities, we can
+rollback or if all is working fine we will increase traffic in our new production environment and observe further on for
+stability.
